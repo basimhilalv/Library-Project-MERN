@@ -64,10 +64,35 @@ app.get('/books/:id', async (request, response) => {
 
 app.put('/books/:id', async (request, response) => {
     try {
+        if (!request.body.title || !request.body.author || !request.body.publishYear) {
+            return response.status(400).send({ message: 'Required fields are not found' });
+        }
+        const result = await Book.findByIdAndUpdate(request.params.id,request.body);
+        if(!result){
+            return response.status(404).json({message:'Book not found'});
+        }else{
+            return response.status(200).send({message:'Book updated successfully'});
+        }
 
     } catch (err) {
         console.log(err.message);
-        response.status(404).send({ message: err.message })
+        response.status(500).send({ message: err.message })
+    }
+})
+
+app.delete('/books/:id', async (request,response)=>{
+    try{
+
+        const result = await Book.findByIdAndDelete(request.params.id);
+        if(!result){
+            return response.status(404).json({message:'Book not found'});
+        }else{
+            return response.status(200).json({message:'Book Deleted Successfully'});
+        }
+
+    } catch(err){
+        console.log(err.message);
+        response.status(500).send({message:err.message});
     }
 })
 
